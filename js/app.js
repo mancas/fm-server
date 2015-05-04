@@ -89,7 +89,7 @@ debug(JSON.stringify(requestOp));
         });
       }
     } else if (requestOp.operation === 'onpropertychange') {
-      console.info('MANU  -  ' + requestOp.handler)
+      console.info('MANU  -  ' + requestOp.handler + ' ' + _mozFMRadio[requestOp.handler])
       if (_mozFMRadio[requestOp.handler]) {
         _mozFMRadio[requestOp.handler] =
           onPropertyChangeTemplate.bind(null, requestOp.handler);
