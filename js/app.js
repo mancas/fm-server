@@ -89,11 +89,8 @@ debug(JSON.stringify(requestOp));
         });
       }
     } else if (requestOp.operation === 'onpropertychange') {
-      console.info('MANU  -  ' + requestOp.handler + ' ' + _mozFMRadio[requestOp.handler])
-      if (_mozFMRadio[requestOp.handler]) {
-        _mozFMRadio[requestOp.handler] =
-          onPropertyChangeTemplate.bind(null, requestOp.handler);
-      }
+      _mozFMRadio[requestOp.handler] =
+        onPropertyChangeTemplate.bind(null, requestOp.handler);
     } else {
       // It's either a get or a set... or an error but let's assume it isn't :P
       // Let's assume this works always..
