@@ -1,0 +1,26 @@
+{
+  "version": "0.1.0",
+  "name": "navConnService",
+  "description": "Service worker - shim testing",
+  "type": "certified",
+  "launch_path": "/nav_connect/service/index.html",
+  "icons": {
+    "16": "/swshim/style/icons/icon.png",
+    "48": "/swshim/style/icons/icon.png",
+    "60": "/swshim/style/icons/icon.png",
+    "128": "/swshim/style/icons/icon.png"
+  },
+  "connections": {
+    "https://testServiceConnect.hostedweb.tid.es/services": {
+      "description": "Test SHIM IAC",
+      "rules": {}
+    }
+  },
+  "permissions": {
+    "settings":{ "access": "readwrite" }
+  },
+  "installs_allowed_from": [
+    "*"
+  ]
+}
+
