@@ -1,23 +1,23 @@
 {
   "version": "0.1.0",
-  "name": "navConnService",
+  "name": "FM - SW - SHIM - SERVER",
   "description": "Service worker - shim testing",
   "type": "certified",
-  "launch_path": "/nav_connect/service/index.html",
+  "launch_path": "/fm-server/index.html",
   "icons": {
-    "16": "/swshim/style/icons/icon.png",
-    "48": "/swshim/style/icons/icon.png",
-    "60": "/swshim/style/icons/icon.png",
-    "128": "/swshim/style/icons/icon.png"
+    "16": "/fm-server/style/icons/icon.png",
+    "48": "/fm-server/style/icons/icon.png",
+    "60": "/fm-server/style/icons/icon.png",
+    "128": "/fm-server/style/icons/icon.png"
   },
   "connections": {
-    "https://testServiceConnect.hostedweb.tid.es/services": {
+    "https://fmradioservice.gaiamobile.org": {
       "description": "Test SHIM IAC",
       "rules": {}
     }
   },
   "permissions": {
-    "settings":{ "access": "readwrite" }
+    "fmradio":{}
   },
   "installs_allowed_from": [
     "*"
