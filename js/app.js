@@ -71,17 +71,13 @@ debug(JSON.stringify(requestOp));
     }
 
     if (requestOp.operation === 'invoke') {
-      debug('INVOKE - ' + typeof _mozFMRadio[requestOp.method] === 'function');
       if (typeof _mozFMRadio[requestOp.method] === 'function') {
         _mozFMRadio[requestOp.method](requestOp.params).then(result => {
           channel.postMessage({
             remotePortId: remotePortId,
             data: {
               id: request.id,
-              result: {
-                name: requestOp.name,
-                value: _mozFMRadio[requestOp.name]
-              }
+              result: result
             }
           });
         }).catch(error => {
