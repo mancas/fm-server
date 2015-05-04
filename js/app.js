@@ -43,28 +43,26 @@
   // be accessed from outside the main thread. So basically everything has to go
   // down to the SW thread, then back up here for processing, then back down to
   // be sent to the client. Yay us!
-  var _locks = {};
-  var _observers = {};
   var processSWRequest = function(channel, evt) {
 
     var _mozFMRadio = navigator.mozFMRadio;
     // We can get:
     // * get
     // * invoke
-    // * observe
+    // * onpropertychange
     // All the operations have a requestId
     var remotePortId = evt.data.remotePortId;
     var request = evt.data.remoteData;
     var requestOp = request.data;
 debug(JSON.stringify(requestOp));
-    function observerTemplate(evt) {
+    function onPropertyChangeTemplate(handler) {
+      debug('PROPERTY CHANGE ' + handler);
       channel.postMessage({
         remotePortId: remotePortId,
         data: {
           id: request.id,
           data: {
-            settingName: evt.settingName,
-            settingValue: evt.settingValue
+            result: handler
           }
         }
       });
@@ -90,13 +88,12 @@ debug(JSON.stringify(requestOp));
           });
         });
       }
-    } else if (requestOp.operation === 'addObserver') {
-      _observers[request.id] = observerTemplate;
-      _settings.addObserver(requestOp.settingName, _observers[request.id]);
-    } else if (requestOp.operation === 'removeObserver') {
-      _settings.removeObserver(_observers[request.id]);
-    } else if (requestOp.operation === 'onsettingchange') {
-      _settings.onsettingchange = observerTemplate;
+    } else if (requestOp.operation === 'onpropertychange') {
+      console.info('MANU  -  ' + requestOp.handler)
+      if (_mozFMRadio[requestOp.handler]) {
+        _mozFMRadio[requestOp.handler] =
+          onPropertyChangeTemplate.bind(null, requestOp.handler);
+      }
     } else {
       // It's either a get or a set... or an error but let's assume it isn't :P
       // Let's assume this works always..
