@@ -71,6 +71,7 @@ debug(JSON.stringify(requestOp));
     }
 
     if (request.operation === 'invoke') {
+      debug('INVOKE - ' + typeof _mozFMRadio[requestOp.method] === 'function');
       if (typeof _mozFMRadio[requestOp.method] === 'function') {
         _mozFMRadio[requestOp.method](requestOp.params).then(result => {
           channel.postMessage({
