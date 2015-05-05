@@ -61,11 +61,9 @@
         remotePortId: remotePortId,
         data: {
           id: request.id,
-          data: {
-            result: {
-              handler: handler,
-              propertyValue: _mozFMRadio[property]
-            }
+          result: {
+            handler: handler,
+            propertyValue: _mozFMRadio[property]
           }
         }
       });
