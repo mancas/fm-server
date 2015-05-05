@@ -95,6 +95,15 @@
               result: result
             }
           });
+        }).catch(error => {
+          console.info(error);
+          channel.postMessage({
+            remotePortId: remotePortId,
+            data: {
+              id: request.id,
+              error: error.message
+            }
+          });
         });
       }
     }
