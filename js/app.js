@@ -54,15 +54,17 @@
     var remotePortId = evt.data.remotePortId;
     var request = evt.data.remoteData;
     var requestOp = request.data;
-debug(JSON.stringify(requestOp));
-    function onPropertyChangeTemplate(handler) {
-      debug('PROPERTY CHANGE ' + handler);
+
+    function onPropertyChangeTemplate(handler, property) {
       channel.postMessage({
         remotePortId: remotePortId,
         data: {
           id: request.id,
           data: {
-            result: handler
+            result: {
+              handler: handler,
+              propertyValue: _mozFMRadio[property]
+            }
           }
         }
       });
@@ -90,7 +92,8 @@ debug(JSON.stringify(requestOp));
       }
     } else if (requestOp.operation === 'onpropertychange') {
       _mozFMRadio[requestOp.handler] =
-        onPropertyChangeTemplate.bind(null, requestOp.handler);
+        onPropertyChangeTemplate.bind(null, requestOp.handler,
+          requestOp.property);
     } else {
       // It's either a get or a set... or an error but let's assume it isn't :P
       // Let's assume this works always..
