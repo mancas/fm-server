@@ -56,6 +56,7 @@
     var requestOp = request.data;
 
     function onPropertyChangeTemplate(handler, property) {
+      debug('PROPERTY CHANGE -- ' + handler + ' ' + property + ' ' + _mozFMRadio[property]);
       channel.postMessage({
         remotePortId: remotePortId,
         data: {
@@ -91,6 +92,7 @@
         });
       }
     } else if (requestOp.operation === 'onpropertychange') {
+      debug('ADD PROPERTY ' + requestOp.property);
       _mozFMRadio[requestOp.handler] =
         onPropertyChangeTemplate.bind(null, requestOp.handler,
           requestOp.property);
