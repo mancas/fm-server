@@ -96,6 +96,7 @@
             }
           });
         }).catch(error => {
+          console.info(error);
           channel.postMessage({
             remotePortId: remotePortId,
             data: {
