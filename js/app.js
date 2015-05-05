@@ -48,7 +48,7 @@
     var _mozFMRadio = navigator.mozFMRadio;
     // We can get:
     // * get
-    // * invoke
+    // * methodName
     // * onpropertychange
     // All the operations have a requestId
     var remotePortId = evt.data.remotePortId;
@@ -56,7 +56,6 @@
     var requestOp = request.data;
 
     function onPropertyChangeTemplate(handler, property) {
-      debug('PROPERTY CHANGE -- ' + handler + ' ' + property + ' ' + _mozFMRadio[property]);
       channel.postMessage({
         remotePortId: remotePortId,
         data: {
@@ -69,9 +68,26 @@
       });
     }
 
-    if (requestOp.operation === 'invoke') {
-      if (typeof _mozFMRadio[requestOp.method] === 'function') {
-        _mozFMRadio[requestOp.method](requestOp.params).then(result => {
+    if (requestOp.operation === 'get') {
+      // It's a get...
+      // Let's assume this works always..
+      channel.postMessage({
+        remotePortId: remotePortId,
+        data: {
+          id: request.id,
+          result: {
+            name: requestOp.name,
+            value: _mozFMRadio[requestOp.name]
+          }
+        }
+      });
+    } else if (requestOp.operation === 'onpropertychange') {
+      _mozFMRadio[requestOp.handler] =
+        onPropertyChangeTemplate.bind(null, requestOp.handler,
+          requestOp.property);
+    } else {
+      if (typeof _mozFMRadio[requestOp.operation] === 'function') {
+        _mozFMRadio[requestOp.operation](requestOp.params).then(result => {
           channel.postMessage({
             remotePortId: remotePortId,
             data: {
@@ -89,24 +105,6 @@
           });
         });
       }
-    } else if (requestOp.operation === 'onpropertychange') {
-      debug('ADD PROPERTY ' + requestOp.property);
-      _mozFMRadio[requestOp.handler] =
-        onPropertyChangeTemplate.bind(null, requestOp.handler,
-          requestOp.property);
-    } else {
-      // It's either a get or a set... or an error but let's assume it isn't :P
-      // Let's assume this works always..
-      channel.postMessage({
-        remotePortId: remotePortId,
-        data: {
-          id: request.id,
-          result: {
-            name: requestOp.name,
-            value: _mozFMRadio[requestOp.name]
-          }
-        }
-      });
     }
   };
 
