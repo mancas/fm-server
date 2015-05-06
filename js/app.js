@@ -56,7 +56,6 @@
     var requestOp = request.data;
 
     function onPropertyChangeTemplate(handler, property) {
-      console.info(property, _mozFMRadio[property]);
       channel.postMessage({
         remotePortId: remotePortId,
         data: {
@@ -97,12 +96,11 @@
             }
           });
         }).catch(error => {
-          console.info(error);
           channel.postMessage({
             remotePortId: remotePortId,
             data: {
               id: request.id,
-              error: error.message
+              error: error
             }
           });
         });
