@@ -5,10 +5,10 @@
   "type": "certified",
   "launch_path": "/fm-server/index.html",
   "icons": {
-    "16": "/fm-server/style/icons/icon.png",
-    "48": "/fm-server/style/icons/icon.png",
-    "60": "/fm-server/style/icons/icon.png",
-    "128": "/fm-server/style/icons/icon.png"
+    "16": "/fm-server/common/style/icons/icon.png",
+    "48": "/fm-server/common/style/icons/icon.png",
+    "60": "/fm-server/common/style/icons/icon.png",
+    "128": "/fm-server/common/style/icons/icon.png"
   },
   "connections": {
     "https://fmradioservice.gaiamobile.org": {
