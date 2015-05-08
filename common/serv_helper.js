@@ -13,6 +13,7 @@
 
   var register = function(evt) {
     debug('APP executing register...');
+    var origin = document.location.origin;
     navigator.serviceWorker.
       register('/fm-server/sw.js', {scope: './'}).
       then(function(reg) {
@@ -39,22 +40,22 @@
     });
   };
 
-  if ('serviceWorker' in navigator) {
-    window.ServiceHelper = {
-      register: function(processSWRequest) {
-        register();
-        navigator.serviceWorker.ready.then(sw => {
-          // Let's pass the SW some way to talk to us...
-          var mc = new MessageChannel();
-          mc.port1.onmessage = processSWRequest.bind(this, mc.port1);
-          sw.active && sw.active.postMessage({}, [mc.port2]);
-        });
-      },
-      unregister: unregister
-    };
-  } else {
-    debug('APP navigator does not have ServiceWorker');
-    return;
-  }
+if ('serviceWorker' in navigator) {
+  window.ServiceHelper = {
+    register: function(processSWRequest) {
+      register();
+      navigator.serviceWorker.ready.then(sw => {
+        // Let's pass the SW some way to talk to us...
+        var mc = new MessageChannel();
+        mc.port1.onmessage = processSWRequest.bind(this, mc.port1);
+        sw.active && sw.active.postMessage({}, [mc.port2]);
+      });
+    },
+    unregister: unregister
+  };
+} else {
+  debug('APP navigator does not have ServiceWorker');
+  return;
+}
 
 })(window);

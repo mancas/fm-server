@@ -7,11 +7,12 @@
 // ADDED FOR POLYFILL
 
 function debug(str) {
-  console.log('MANU - Setting Service SW -*- -->' + str);
+  console.log('FMRadio Service SW -*- -->' + str);
 }
 
 // ADDED FOR POLYFILL: Import the polyfill script
-this.importScripts('/fm-server/common/polyfill/navigator_connect_sw.js');
+this.
+  importScripts('/fm-server/common/polyfill/navigator_connect_sw.js');
 // END ADDED FOR POLYFILL
 
 this.addEventListener('install', function(evt) {
