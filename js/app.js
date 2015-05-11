@@ -2,7 +2,7 @@
   'use strict';
 
   function debug(str) {
-    console.log('FMRadioService -*-:' + str);
+    console.log('Manu FMRadioService -*-:' + str);
   }
 
   // Ok, this kinda sucks because most APIs (and settings is one of them) cannot

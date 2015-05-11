@@ -7,7 +7,7 @@
 // ADDED FOR POLYFILL
 
 function debug(str) {
-  console.log('FMRadio Service SW -*- -->' + str);
+  console.log('MANU FMRadio Service SW -*- -->' + str);
 }
 
 // ADDED FOR POLYFILL: Import the polyfill script
