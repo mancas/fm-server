@@ -21,6 +21,21 @@
     var request = evt.data.remoteData;
     var requestOp = request.data;
 
+    function _cloneObject(obj) {
+      var cloned = {};
+      for (var key in obj) {
+        if ((typeof obj[key] !== 'object' && typeof obj[key] !== 'function') ||
+          obj[key] === null) {
+            cloned[key] = obj[key];
+        } else {
+          if (typeof obj[key] === 'object') {
+            cloned[key] = _cloneObject(obj[key]);
+          }
+        }
+      }
+      return cloned;
+    }
+
     function onPropertyChangeTemplate(handler, property) {
       channel.postMessage({
         remotePortId: remotePortId,
@@ -66,7 +81,7 @@
             remotePortId: remotePortId,
             data: {
               id: request.id,
-              error: JSON.stringify(error)
+              error: _cloneObject(error)
             }
           });
         });
