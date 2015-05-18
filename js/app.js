@@ -21,16 +21,16 @@
     var request = evt.data.remoteData;
     var requestOp = request.data;
 
-    function _cloneObject(obj) {
+    function _cloneObject(obj, recursive) {
       var cloned = {};
       for (var key in obj) {
         if (typeof obj[key] === 'object') {
-          cloned[key] = obj[key];
+          cloned[key] = recursive && _cloneObject(obj[key]) || obj[key];
           continue;
         }
 
-        if (typeof obj[key] !== 'function') {
-          cloned[key] = obj[key];
+        if (typeof obj[key] !== 'function' || obj[key] === null) {
+            cloned[key] = obj[key];
         }
       }
       return cloned;
