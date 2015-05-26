@@ -2,90 +2,114 @@
   'use strict';
 
   function debug(str) {
-    console.log('Manu FMRadioService -*-:' + str);
+    console.log('MANU FMRadioService -*-:' + str);
   }
 
-  // Ok, this kinda sucks because most APIs (and settings is one of them) cannot
-  // be accessed from outside the main thread. So basically everything has to go
-  // down to the SW thread, then back up here for processing, then back down to
-  // be sent to the client. Yay us!
-  var processSWRequest = function(channel, evt) {
+  var _mozFMRadio = navigator.mozFMRadio;
 
-    var _mozFMRadio = navigator.mozFMRadio;
-    // We can get:
-    // * get
-    // * methodName
-    // * onpropertychange
-    // All the operations have a requestId
-    var remotePortId = evt.data.remotePortId;
-    var request = evt.data.remoteData;
-    var requestOp = request.data;
+  function buildDOMRequestAnswer(operation, channel, request) {
+    debug('Building call --> ' + JSON.stringify(request));
+    var remotePortId = request.remotePortId;
+    var reqId = request.remoteData.id;
+    var opData = request.remoteData.data.params || [];
+    var requestOp = request.remoteData.data;
 
-    function _cloneObject(obj, recursive) {
-      var cloned = {};
-      for (var key in obj) {
-        if (typeof obj[key] === 'object') {
-          cloned[key] = recursive && _cloneObject(obj[key]) || obj[key];
-          continue;
-        }
-
-        if (typeof obj[key] !== 'function' || obj[key] === null) {
-            cloned[key] = obj[key];
-        }
-      }
-      return cloned;
-    }
-
-    function onPropertyChangeTemplate(handler, property) {
-      channel.postMessage({
-        remotePortId: remotePortId,
-        data: {
-          id: request.id,
-          result: {
-            handler: handler,
-            propertyValue: _mozFMRadio[property]
-          }
-        }
-      });
-    }
-
-    if (requestOp.operation === 'get') {
-      // It's a get...
+    if (operation === 'get') {
       // Let's assume this works always..
       channel.postMessage({
         remotePortId: remotePortId,
         data: {
-          id: request.id,
+          id: reqId,
           result: {
             name: requestOp.name,
             value: _mozFMRadio[requestOp.name]
           }
         }
       });
-    } else if (requestOp.operation === 'onpropertychange') {
-      _mozFMRadio[requestOp.handler] =
-        onPropertyChangeTemplate.bind(null, requestOp.handler,
-          requestOp.property);
+      return;
+    }
+
+    _mozFMRadio[operation](...opData).then(result => {
+      channel.postMessage({
+        remotePortId: remotePortId,
+        data: {
+          id: reqId,
+          result: result
+        }
+      });
+    }).catch(error => {
+      channel.postMessage({
+        remotePortId: remotePortId,
+        data: {
+          id: reqId,
+          error: window.ServiceHelper.cloneObject(error)
+        }
+      });
+    });
+  }
+
+  function setHandler(eventType, channel, request) {
+    var remotePortId = request.remotePortId;
+    var reqId = request.remoteData.id;
+    var requestOp = request.remoteData.data;
+
+    function onPropertyChangeTemplate() {
+      channel.postMessage({
+        remotePortId: remotePortId,
+        data: {
+          id: reqId,
+          event: {
+            type: eventType,
+            property: requestOp.property,
+            propertyValue: _mozFMRadio[requestOp.property]
+          }
+        }
+      });
+    }
+
+    _mozFMRadio[eventType] = onPropertyChangeTemplate;
+  };
+
+  var _operations = {
+    disable: buildDOMRequestAnswer.bind(this, 'disable'),
+
+    enable: buildDOMRequestAnswer.bind(this, 'enable'),
+
+    seekUp: buildDOMRequestAnswer.bind(this, 'seekUp'),
+
+    seekDown: buildDOMRequestAnswer.bind(this, 'seekDown'),
+
+    cancelSeek: buildDOMRequestAnswer.bind(this, 'cancelSeek'),
+
+    setFrequency: buildDOMRequestAnswer.bind(this, 'setFrequency'),
+
+    get: buildDOMRequestAnswer.bind(this, 'get')
+  };
+  ['onfrequencychange', 'onenabled', 'ondisabled', 'onantennaavailablechange'].
+    forEach(evt => {
+      _operations[evt] = setHandler.bind(undefined, evt);
+  });
+
+  // Ok, this kinda sucks because most APIs (and settings is one of them) cannot
+  // be accessed from outside the main thread. So basically everything has to go
+  // down to the SW thread, then back up here for processing, then back down to
+  // be sent to the client. Yay us!
+  var processSWRequest = function(channel, evt) {
+    // We can get:
+    // * get
+    // * methodName
+    // * onpropertychange
+    // All the operations have a requestId
+    var request = evt.data.remoteData;
+    var requestOp = request.data.operation;
+
+    debug('processSWRequest --> processing a msg:' +
+          (evt.data ? JSON.stringify(evt.data): 'msg without data'));
+    if (requestOp in _operations) {
+      _operations[requestOp] &&
+        _operations[requestOp](channel, evt.data);
     } else {
-      if (typeof _mozFMRadio[requestOp.operation] === 'function') {
-        _mozFMRadio[requestOp.operation](requestOp.params).then(result => {
-          channel.postMessage({
-            remotePortId: remotePortId,
-            data: {
-              id: request.id,
-              result: result
-            }
-          });
-        }).catch(error => {
-          channel.postMessage({
-            remotePortId: remotePortId,
-            data: {
-              id: request.id,
-              error: _cloneObject(error)
-            }
-          });
-        });
-      }
+      console.error('FMRadio service unknown operation:' + requestOp);
     }
   };
 
