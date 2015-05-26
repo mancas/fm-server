@@ -21,8 +21,8 @@
         data: {
           id: reqId,
           result: {
-            name: requestOp.name,
-            value: _mozFMRadio[requestOp.name]
+            name: ...opData,
+            value: _mozFMRadio[...opData]
           }
         }
       });
