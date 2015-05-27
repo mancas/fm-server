@@ -52,8 +52,9 @@
     var remotePortId = request.remotePortId;
     var reqId = request.remoteData.id;
     var requestOp = request.remoteData.data;
-
+console.info(eventType, channel, request);
     function onPropertyChangeTemplate() {
+      console.info('here');
       channel.postMessage({
         remotePortId: remotePortId,
         data: {
